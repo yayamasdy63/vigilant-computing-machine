@@ -1,0 +1,25 @@
+name: Auto Update README
+on:
+  schedule:
+    - cron: '0 0 * * *' # يعمل تلقائياً كل يوم بتوقيت جرينتش
+  workflow_dispatch: # زر لتشغيله يدوياً متى شئت
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update README file
+        run: |
+          echo "### Last Profile Update: $(date)" > UPDATE.md
+          cat UPDATE.md README.md > TEMP_README.md && mv TEMP_README.md README.md
+          rm UPDATE.md
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add README.md
+          git commit -m "Update README with timestamp" || exit 0
+          git push
